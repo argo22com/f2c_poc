@@ -7,3 +7,5 @@ services:
       context: .
       dockerfile: ./.docker/Dockerfile
     restart: "no"
+    volumes:
+      - ./output:/output

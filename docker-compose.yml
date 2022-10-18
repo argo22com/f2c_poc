@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  python:
+    environment:
+      TZ: "Etc/UTC"
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile
+    restart: "no"
+    volumes:
+      - ./Fields2Cover:/Fields2Cover

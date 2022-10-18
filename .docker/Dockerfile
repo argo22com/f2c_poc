@@ -1,17 +1,22 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS build-deps
 
-RUN apt-get -y update
-RUN apt-get install -y --no-install-recommends software-properties-common
-RUN add-apt-repository -y ppa:ubuntugis/ppa
-RUN apt-get -y update
-RUN apt-get install -y --no-install-recommends build-essential ca-certificates cmake \
-    doxygen g++ git libeigen3-dev libgdal-dev libpython3-dev python3 python3-pip \
-    python3-matplotlib lcov libgtest-dev swig libtbb-dev
-
-RUN ln -s /usr/bin/python3 /usr/bin/python && \
+RUN apt-get -y update && \
+    apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository -y ppa:ubuntugis/ppa && \
+    apt-get -y update && \
+    apt-get install -y --no-install-recommends build-essential ca-certificates cmake \
+        doxygen g++ git libeigen3-dev libgdal-dev libpython3-dev python3 python3-pip \
+        python3-matplotlib lcov libgtest-dev swig libtbb-dev && \
+\
+    ln -s /usr/bin/python3 /usr/bin/python && \
     python -m pip install gcovr
 
-COPY . ./f2c
+
+FROM build-deps AS f2c
+
+RUN mkdir -p /f2c
+
+COPY ./Fields2Cover /f2c/Fields2Cover
 
 WORKDIR /f2c/Fields2Cover
 
@@ -21,4 +26,10 @@ RUN mkdir -p build && \
     make -j$(nproc) && \
     make install
 
-CMD ../test.py
+
+FROM f2c AS app
+
+COPY ./test.py /test.py
+COPY --from=f2c /usr/local /usr/local
+
+CMD /test.py

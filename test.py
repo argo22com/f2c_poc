@@ -1,7 +1,6 @@
 #!/bin/python
 
 import fields2cover as f2c
-import time
 
 boundaries = [
         [48.941325, 14.452474],

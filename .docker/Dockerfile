@@ -6,7 +6,7 @@ RUN apt-get -y update && \
     apt-get -y update && \
     apt-get install -y --no-install-recommends build-essential ca-certificates cmake \
         doxygen g++ git libeigen3-dev libgdal-dev libpython3-dev python3 python3-pip \
-        python3-matplotlib lcov libgtest-dev swig libtbb-dev && \
+        python3-matplotlib lcov libgtest-dev swig libtbb-dev gdal-bin python3-gdal && \
 \
     ln -s /usr/bin/python3 /usr/bin/python && \
     python -m pip install gcovr

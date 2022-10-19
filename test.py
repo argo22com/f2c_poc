@@ -40,12 +40,13 @@ field = f2c.Field(cells, "Test-field")
 
 robot = robot()
 const_hl = f2c.HG_Const_gen();
-no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.robot_width)
+#no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.robot_width)
+no_hl = const_hl.generateHeadlands(cells, 0.000008)
 
 print("Area of the field space: ", field.getArea())
 print("Area of the field w/o headlands: ", no_hl.getArea())
-f2c.Visualizer.figure(100)
-f2c.Visualizer.plot(field)
-f2c.Visualizer.plot(no_hl)
+#f2c.Visualizer.figure(100)
+f2c.Visualizer.plot(cell, "tab:orange")
+f2c.Visualizer.plot(no_hl.getCell(0))
 f2c.Visualizer.show()
-f2c.Visualizer.save("/output/field_with_headland")
+f2c.Visualizer.save("/output/field_new")

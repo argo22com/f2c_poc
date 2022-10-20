@@ -3,6 +3,7 @@
 import fields2cover as f2c
 from osgeo import ogr
 from osgeo import osr
+import math
 
 def research():
     global robot, headland, ring, field, swaths
@@ -56,7 +57,7 @@ def research():
     def swaths(robot, headland, algoImpl=None):
         if algoImpl == None:
             algoImpl = f2c.SG_BruteForce()
-        swath = f2c.OBJ_NSwath(); # is this needed for later reference?
+        swath = f2c.OBJ_SwathLength() # cost function
         return algoImpl.generateBestSwaths(
                 swath,
                 robot.op_width,

@@ -42,13 +42,26 @@ def research():
         #no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.robot_width)
         no_hl = const_hl.generateHeadlands(cells, 0.000008)
 
+        visualize([cell, no_hl.getCell(0)])
+
+        return [field.getArea(), no_hl.getArea(), img_target + '.png']
+
+    def visualize(cellItems):
         #f2c.Visualizer.figure(100)
-        f2c.Visualizer.plot(cell, "tab:orange")
-        f2c.Visualizer.plot(no_hl.getCell(0))
+        iter = 0
+        for item in cellItems:
+            f2c.Visualizer.plot(item, plotColour(iter))
+            iter = iter + 1
         f2c.Visualizer.show()
         f2c.Visualizer.save(img_target)
 
-        return [field.getArea(), no_hl.getArea(), img_target + '.png']
+    def plotColour(intOrder):
+        if intOrder == 0:
+            return "tab:orange"
+        if intOrder == 1:
+            return "tab:blue"
+        # don't know more colours :(
+        return "tab:olive"
 
     def getBoundaries():
         return [[48.941325, 14.452474],

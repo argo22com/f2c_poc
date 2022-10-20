@@ -5,7 +5,7 @@ from osgeo import ogr
 from osgeo import osr
 
 def research():
-    global robot, headland, ring, field
+    global robot, headland, ring, field, swaths
 
     img_target = "/output/field_vis"
 
@@ -39,16 +39,29 @@ def research():
 
     def run(img_target):
         # I don't get why this is necessary, but never mind
-        global robot, headland, ring, field
+        global robot, headland, ring, field, swaths
 
         robot = robot()
         ring = ring()
         field = field(ring)
         headland = headland(field, robot)
+        swaths = swaths(robot, headland)
 
-        visualize([field.field.getCell(0), headland.getCell(0)])
+        visualize(
+                [field.field.getCell(0), headland.getCell(0)],
+                swaths)
 
         return [field.getArea(), headland.getArea(), img_target + '.png']
+
+    def swaths(robot, headland, algoImpl=None):
+        if algoImpl == None:
+            algoImpl = f2c.SG_BruteForce()
+        swath = f2c.OBJ_NSwath(); # is this needed for later reference?
+        return algoImpl.generateBestSwaths(
+                swath,
+                robot.op_width,
+                headland.getGeometry(0))
+
 
     def headland(field, robot):
         hl = f2c.HG_Const_gen();
@@ -69,22 +82,32 @@ def research():
         ring.addPoint(point(str(boundaries[0][0]), str(boundaries[0][1])))
         return ring
 
-    def visualize(cellItems):
+    def visualize(cellItems, swaths):
         f2c.Visualizer.figure(100)
-        iter = 0
-        for item in cellItems:
-            f2c.Visualizer.plot(item, plotColour(iter))
-            iter = iter + 1
+        iter = plotCellItems(cellItems, 0)
+        iter = plotSwaths(swaths, iter)
         f2c.Visualizer.show()
         f2c.Visualizer.save(img_target)
 
+    def plotCellItems(cellItems, iter):
+        for item in cellItems:
+            f2c.Visualizer.plot(item, plotColour(iter))
+            iter = iter + 1
+        return iter
+
+    def plotSwaths(swaths, iter):
+        mls = f2c.MultiLineString()
+        for swath in swaths:
+            ls = swath.getPath()
+            mls.addGeometry(ls)
+        f2c.Visualizer.plot(mls)
+        iter = iter + 1
+        return iter
+
     def plotColour(intOrder):
-        if intOrder == 0:
-            return "tab:orange"
-        if intOrder == 1:
-            return "tab:blue"
-        # don't know more colours :(
-        return "tab:olive"
+        colours = ["brown", "gray", "green", "red", "purple", "blue", "pink",
+                "orange", "olive", "cyan"]
+        return "tab:{}".format(colours[intOrder % 10])
 
     def getBoundaries():
         return [[48.941325, 14.452474],

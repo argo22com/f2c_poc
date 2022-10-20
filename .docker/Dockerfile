@@ -32,4 +32,4 @@ FROM f2c AS app
 COPY ./src /src
 COPY --from=f2c /usr/local /usr/local
 
-CMD /src/server.py
+CMD ["python", "-u", "/src/server.py"]

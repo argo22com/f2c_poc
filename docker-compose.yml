@@ -9,3 +9,6 @@ services:
     restart: "no"
     volumes:
       - ./output:/output
+      - ./src:/src
+    ports:
+      - 80:80

@@ -29,7 +29,7 @@ RUN mkdir -p build && \
 
 FROM f2c AS app
 
-COPY ./test.py /test.py
+COPY ./src /src
 COPY --from=f2c /usr/local /usr/local
 
-CMD /test.py
+CMD /src/server.py

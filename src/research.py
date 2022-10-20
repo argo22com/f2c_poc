@@ -83,26 +83,24 @@ def research():
         return ring
 
     def visualize(cellItems, swaths):
-        f2c.Visualizer.figure(100)
-        iter = plotCellItems(cellItems, 0)
-        iter = plotSwaths(swaths, iter)
+        plotCellItems(cellItems)
+        plotSwaths(swaths)
         f2c.Visualizer.show()
         f2c.Visualizer.save(img_target)
 
-    def plotCellItems(cellItems, iter):
+    def plotCellItems(cellItems):
+        iter = 0
         for item in cellItems:
             f2c.Visualizer.plot(item, plotColour(iter))
             iter = iter + 1
         return iter
 
-    def plotSwaths(swaths, iter):
+    def plotSwaths(swaths):
         mls = f2c.MultiLineString()
         for swath in swaths:
             ls = swath.getPath()
             mls.addGeometry(ls)
         f2c.Visualizer.plot(mls)
-        iter = iter + 1
-        return iter
 
     def plotColour(intOrder):
         colours = ["brown", "gray", "green", "red", "purple", "blue", "pink",

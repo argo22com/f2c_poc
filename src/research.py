@@ -5,7 +5,7 @@ from osgeo import ogr
 from osgeo import osr
 
 def research():
-    global robot
+    global robot, headland, ring, field
 
     img_target = "/output/field_vis"
 
@@ -39,25 +39,35 @@ def research():
 
     def run(img_target):
         # I don't get why this is necessary, but never mind
-        global robot
+        global robot, headland, ring, field
+
+        robot = robot()
+        ring = ring()
+        field = field(ring)
+        headland = headland(field, robot)
+
+        visualize([field.field.getCell(0), headland.getCell(0)])
+
+        return [field.getArea(), headland.getArea(), img_target + '.png']
+
+    def headland(field, robot):
+        hl = f2c.HG_Const_gen();
+        return hl.generateHeadlands(field.field, robot.robot_width)
+
+    def field(ring):
+        cell = f2c.Cell(ring)
+        cells = f2c.Cells(cell)
+        field = f2c.Field(cells, "Plana test-field")
+        return field
+
+    def ring():
         ring = f2c.LinearRing()
         boundaries = getBoundaries()
         for i in boundaries:
             ring.addPoint(point(str(i[0]), str(i[1])))
         # add the first point again to close the circle
         ring.addPoint(point(str(boundaries[0][0]), str(boundaries[0][1])))
-
-        cell = f2c.Cell(ring)
-        cells = f2c.Cells(cell)
-        field = f2c.Field(cells, "Plana test-field")
-
-        robot = robot()
-        const_hl = f2c.HG_Const_gen();
-        no_hl = const_hl.generateHeadlands(cells, robot.robot_width)
-
-        visualize([cell, no_hl.getCell(0)])
-
-        return [field.getArea(), no_hl.getArea(), img_target + '.png']
+        return ring
 
     def visualize(cellItems):
         f2c.Visualizer.figure(100)

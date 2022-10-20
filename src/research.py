@@ -2,11 +2,12 @@
 
 import fields2cover as f2c
 from osgeo import ogr
+from osgeo import osr
 
 def research():
     global robot
 
-    img_target = "/output/field_new"
+    img_target = "/output/field_vis"
 
     def robot():
         r = f2c.Robot(2.357, 2.357)
@@ -17,11 +18,24 @@ def research():
         return r
 
     def point(lat, lon):
+        point = f2c.Point()
+        point.importFromWkt(ogrpoint(lat, lon).ExportToWkt())
+        return point
+
+    def ogrpoint(lat, lon):
         ogrpoint = ogr.Geometry(ogr.wkbPoint)
         ogrpoint.AddPoint(float(lat), float(lon))
-        point = f2c.Point()
-        point.importFromWkt(ogrpoint.ExportToWkt())
-        return point
+        transformed = transform_by_epsg(ogrpoint)
+        return transformed
+
+    def transform_by_epsg(ogrpoint):
+        in_sr = osr.SpatialReference()
+        in_sr.ImportFromEPSG(4326) # standard WSG84
+        out_sr = osr.SpatialReference()
+        out_sr.ImportFromEPSG(32756) # WSG84 in meters
+        ogrpoint.AssignSpatialReference(in_sr)
+        ogrpoint.TransformTo(out_sr)
+        return ogrpoint
 
     def run(img_target):
         # I don't get why this is necessary, but never mind
@@ -35,19 +49,18 @@ def research():
 
         cell = f2c.Cell(ring)
         cells = f2c.Cells(cell)
-        field = f2c.Field(cells, "Test-field")
+        field = f2c.Field(cells, "Plana test-field")
 
         robot = robot()
         const_hl = f2c.HG_Const_gen();
-        #no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.robot_width)
-        no_hl = const_hl.generateHeadlands(cells, 0.000008)
+        no_hl = const_hl.generateHeadlands(cells, robot.robot_width)
 
         visualize([cell, no_hl.getCell(0)])
 
         return [field.getArea(), no_hl.getArea(), img_target + '.png']
 
     def visualize(cellItems):
-        #f2c.Visualizer.figure(100)
+        f2c.Visualizer.figure(100)
         iter = 0
         for item in cellItems:
             f2c.Visualizer.plot(item, plotColour(iter))

@@ -40,12 +40,13 @@ def research():
 
     def run(img_target):
         # I don't get why this is necessary, but never mind
-        global robot, headland, ring, field, swaths
+        global robot, headland, fring, field, swaths
 
         robot = robot()
-        ring = ring()
-        field = field(ring)
-        headland = headland(field, robot)
+        fring = ring(getBoundaries())
+        field = field(fring)
+        hlRing = ring(getHeadlandBoundaries())
+        headland = f2c.Cells(f2c.Cell(hlRing))
         swaths = swaths(robot, headland)
 
         visualize(
@@ -74,9 +75,8 @@ def research():
         field = f2c.Field(cells, "Plana test-field")
         return field
 
-    def ring():
+    def ring(boundaries):
         ring = f2c.LinearRing()
-        boundaries = getBoundaries()
         for i in boundaries:
             ring.addPoint(point(str(i[0]), str(i[1])))
         # add the first point again to close the circle
@@ -117,5 +117,15 @@ def research():
                 [48.941791, 14.452698],
                 [48.941324, 14.452555],
                 [48.941322, 14.452484]]
+
+    def getHeadlandBoundaries():
+        return [[48.941394, 14.452505],
+                [48.941400, 14.452466],
+                [48.942137, 14.452581],
+                [48.942132, 14.452745],
+                [48.941827, 14.452680],
+                [48.941791, 14.452698],
+                [48.941384, 14.452573],
+                [48.941392, 14.452516]]
 
     return run(img_target)

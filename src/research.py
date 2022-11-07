@@ -40,7 +40,6 @@ def research():
         robot = fn_robot()
         ring = fn_ring(getBoundaries())
         field = fn_field(ring)
-        field.setEPSGCoordSystem(32756)
         hl_ring = fn_ring(getHeadlandBoundaries())
         headland = f2c.Cells(f2c.Cell(hl_ring))
         swaths = fn_swaths(robot, headland)
@@ -51,13 +50,6 @@ def research():
 
         return [field.getArea(),
                 headland.getArea(),
-                img_target + '.png',
-                ring.exportToJson(),
-                hl_ring.exportToJson(),
-                field.field.getGeometry(0).exportToJson(),
-                field.isCoordSystemEPSG(),
-                field.isCoordSystemUTM(),
-                field.getCellsAbsPosition().getGeometry(0).exportToJson()
                 ]
 
     def fn_swaths(robot, headland, algoImpl=None):

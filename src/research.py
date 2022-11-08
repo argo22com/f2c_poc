@@ -6,11 +6,9 @@ from osgeo import osr
 import math
 
 def research():
-    global robot, headland, ring, field, swaths
-
     img_target = "/output/field_vis"
 
-    def robot():
+    def fn_robot():
         r = f2c.Robot(2.357, 2.357)
         r.cruise_speed = 0.5
         r.linear_curv_change = 1.0
@@ -39,22 +37,22 @@ def research():
         return ogrpoint
 
     def run(img_target):
-        # I don't get why this is necessary, but never mind
-        global robot, headland, ring, field, swaths
-
-        robot = robot()
-        ring = ring()
-        field = field(ring)
-        headland = headland(field, robot)
-        swaths = swaths(robot, headland)
+        robot = fn_robot()
+        ring = fn_ring(getBoundaries())
+        field = fn_field(ring)
+        hl_ring = fn_ring(getHeadlandBoundaries())
+        headland = f2c.Cells(f2c.Cell(hl_ring))
+        swaths = fn_swaths(robot, headland)
 
         visualize(
-                [field.field.getCell(0), headland.getCell(0)],
+                [field.getCellsAbsPosition().getCell(0), headland.getCell(0)],
                 swaths)
 
-        return [field.getArea(), headland.getArea(), img_target + '.png']
+        return [field.getArea(),
+                headland.getArea(),
+                ]
 
-    def swaths(robot, headland, algoImpl=None):
+    def fn_swaths(robot, headland, algoImpl=None):
         if algoImpl == None:
             algoImpl = f2c.SG_BruteForce()
         swath = f2c.OBJ_SwathLength() # cost function
@@ -64,19 +62,18 @@ def research():
                 headland.getGeometry(0))
 
 
-    def headland(field, robot):
+    def fn_headland(field, robot):
         hl = f2c.HG_Const_gen();
         return hl.generateHeadlands(field.field, robot.robot_width)
 
-    def field(ring):
+    def fn_field(ring):
         cell = f2c.Cell(ring)
         cells = f2c.Cells(cell)
         field = f2c.Field(cells, "Plana test-field")
         return field
 
-    def ring():
+    def fn_ring(boundaries):
         ring = f2c.LinearRing()
-        boundaries = getBoundaries()
         for i in boundaries:
             ring.addPoint(point(str(i[0]), str(i[1])))
         # add the first point again to close the circle
@@ -117,5 +114,15 @@ def research():
                 [48.941791, 14.452698],
                 [48.941324, 14.452555],
                 [48.941322, 14.452484]]
+
+    def getHeadlandBoundaries():
+        return [[48.941394, 14.452505],
+                [48.941400, 14.452466],
+                [48.942137, 14.452581],
+                [48.942132, 14.452745],
+                [48.941827, 14.452680],
+                [48.941791, 14.452698],
+                [48.941384, 14.452573],
+                [48.941392, 14.452516]]
 
     return run(img_target)
